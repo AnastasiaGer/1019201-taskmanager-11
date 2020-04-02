@@ -1,7 +1,7 @@
 # Личный проект «Менеджер задач» [![Build status][travis-image]][travis-url]
 
 * Студент: [Anastasia Germanova](https://up.htmlacademy.ru/ecmascript/11/user/1019201).
-* Наставник: `Неизвестно`.
+* Наставник: [`Виталий Усик`] (https://htmlacademy.ru/profile/id235226).
 
 ---
 
