@@ -14,14 +14,14 @@ const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 const siteMainElement = document.querySelector(`.main`);
 const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
-const filters = generateFilters();
-const tasks = generateTasks(TASK_COUNT);
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
 const init = () => {
+  const filters = generateFilters();
+  const tasks = generateTasks(TASK_COUNT);
 
   render(siteHeaderElement, createSiteMenuTemplate(), `beforeend`);
   render(siteMainElement, createFilterTemplate(filters), `beforeend`);
@@ -57,3 +57,4 @@ const init = () => {
 };
 
 init();
+
