@@ -12,6 +12,13 @@ export default class AbstractComponent {
     this._element = null;
   }
 
+  // В компонентах есть метод с общим именем, но различной реализацией - `getTemplate`.
+  // Добавим его в абстрактный класс, но его реализация в нем будет бросать исключение.
+  // Это значит, что его потребуется переопределить в классах-наследниках.
+  getTemplate() {
+    throw new Error(`Abstract method not implemented: getTemplate`);
+  }
+
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
