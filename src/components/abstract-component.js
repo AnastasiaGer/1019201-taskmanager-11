@@ -1,7 +1,8 @@
 // Проверка в конструкторе очень важна. Она позволит использовать абстрактный
 // класс только в качестве родительского класса и выбросит ошибку при попытке
 // выполнить `const c = new AbstractComponent()`.
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
+
 export default class AbstractComponent {
   constructor() {
     if (new.target === AbstractComponent) {
