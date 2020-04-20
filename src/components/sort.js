@@ -5,7 +5,7 @@ export const SortType = {
   DATE_UP: `date-up`,
   DEFAULT: `default`,
 };
-
+// Добавит в разметку data-set'ы с типом сортировки
 const createSortTemplate = () => {
   return (
     `<div class="board__filter-list">
@@ -33,6 +33,7 @@ export default class Sort extends AbstractComponent {
     return this._currenSortType;
   }
 
+  // Реализует сеттер для обработчика изменения типа сортировки
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
