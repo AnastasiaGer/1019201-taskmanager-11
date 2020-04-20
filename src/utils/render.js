@@ -29,8 +29,7 @@ export const replace = (parent, newElement, oldElement) => {
 };
 
 // Создаст функцию `remove` для для удаления DOM-элемента
-export const remove = (element) => {
-  element.remove();
+export const remove = (component) => {
+  component.getElement().remove();
+  component.removeElement();
 };
-
-
