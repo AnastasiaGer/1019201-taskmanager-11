@@ -21,3 +21,15 @@ export const render = (container, element, place) => {
       break;
   }
 };
+
+// Создаст функцию `replace` для для замены одного DOM-элемента на другой
+export const replace = (parent, newElement, oldElement) => {
+  parent.replaceChild(newElement, oldElement);
+};
+
+// Создаст функцию `remove` для для удаления DOM-элемента
+export const remove = (element) => {
+  element.remove();
+};
+
+
