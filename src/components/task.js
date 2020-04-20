@@ -1,8 +1,15 @@
+import AbstractComponent from "./abstract-component.js";
 import {MONTH_NAMES} from "../const.js";
-import {formatTime, createElement} from "../utils.js";
+import {formatTime} from "../utils/common.js";
 
 
+// Функцию для генерации HTML-разметки можно превратить в метод класса,
+// однако делать мы этого не будем, потому что это не критично,
+// а функция у нас уже была описана
 const createTaskTemplate = (task) => {
+  // Обратите внимание, что всю работу мы производим заранее.
+  // Внутри шаблонной строки мы не производим никаких вычислений,
+  // потому что внутри большой разметки сложно искать какой-либо код
   const {description, dueDate, color, repeatingDays, isArchive, isFavorite} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
@@ -33,14 +40,17 @@ const createTaskTemplate = (task) => {
             favorites
           </button>
         </div>
+
         <div class="card__color-bar">
           <svg class="card__color-bar-wave" width="100%" height="10">
             <use xlink:href="#wave"></use>
           </svg>
         </div>
+
         <div class="card__textarea-wrap">
           <p class="card__text">${description}</p>
         </div>
+
         <div class="card__settings">
           <div class="card__details">
             <div class="card__dates">
@@ -58,26 +68,21 @@ const createTaskTemplate = (task) => {
   </article>`;
 };
 
-export default class Task {
+export default class Task extends AbstractComponent {
   constructor(task) {
-    this._task = task;
+    super();
 
-    this._element = null;
+    this._task = task;
   }
 
   getTemplate() {
     return createTaskTemplate(this._task);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  // Добавит в компонент методы для подписки на события
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--edit`)
+      .addEventListener(`click`, handler);
   }
 }
