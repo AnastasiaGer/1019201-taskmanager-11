@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
 import {MONTH_NAMES} from "../const.js";
-import {formatTime} from "../utils/utils.js";
+import {formatTime} from "../utils/common.js";
 
 
 // Функцию для генерации HTML-разметки можно превратить в метод класса,
@@ -77,5 +77,12 @@ export default class Task extends AbstractComponent {
 
   getTemplate() {
     return createTaskTemplate(this._task);
+  }
+
+
+  // Добавит в компонент методы для подписки на события
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--edit`)
+      .addEventListener(`click`, handler);
   }
 }

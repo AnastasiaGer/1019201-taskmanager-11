@@ -10,4 +10,9 @@ export default class LoadMoreButton extends AbstractComponent {
   getTemplate() {
     return createLoadMoreButtonTemplate();
   }
+
+  // Добавит в компонент `load-more` метод для подписки на клик
+  setClickHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
+  }
 }
