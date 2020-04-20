@@ -23,10 +23,19 @@ export const render = (container, component, place) => {
   }
 };
 
-// Создаст функцию `replace` для для замены одного DOM-элемента на другой
-export const replace = (parent, newElement, oldElement) => {
-  parent.replaceChild(newElement, oldElement);
+// Создаст функцию `replace` для для замены одного DOM-элемента на другой. Делает проверку на существование элементов
+export const replace = (newComponent, oldComponent) => {
+  const parentElement = oldComponent.getElement().parentElement;
+  const newElement = newComponent.getElement();
+  const oldElement = oldComponent.getElement();
+
+  const isExistElements = !!(parentElement && newElement && oldElement);
+
+  if (isExistElements && parentElement.contains(oldElement)) {
+    parentElement.replaceChild(newElement, oldElement);
+  }
 };
+
 
 // Создаст функцию `remove` для для удаления DOM-элемента
 export const remove = (component) => {

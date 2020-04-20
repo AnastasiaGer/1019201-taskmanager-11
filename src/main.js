@@ -17,11 +17,11 @@ const TASKS_PER_PAGE = 8;
 
 const renderTask = (taskListElement, task) => {
   const replaceTaskToEdit = () => {
-    replace(taskListElement, taskEditComponent.getElement(), taskComponent.getElement());
+    replace(taskEditComponent, taskComponent);
   };
 
   const replaceEditToTask = () => {
-    replace(taskListElement, taskComponent.getElement(), taskEditComponent.getElement());
+    replace(taskComponent, taskEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
