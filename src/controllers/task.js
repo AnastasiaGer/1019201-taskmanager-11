@@ -1,6 +1,6 @@
 import TaskComponent from "../components/task.js";
 import TaskEditComponent from "../components/task-edit.js";
-import { render, replace, RenderPosition } from "../utils/render.js";
+import {render, replace, RenderPosition} from "../utils/render.js";
 
 export default class TaskController {
   // Конструктор должен принимать container — элемент, в который контроллер будет всё отрисовывать.
