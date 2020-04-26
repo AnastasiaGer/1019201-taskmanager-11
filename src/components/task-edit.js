@@ -54,7 +54,6 @@ const createTaskEditTemplate = (task, options = {}) => {
   const {isDateShowing, isRepeatingTask, activeRepeatingDays} = options;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  // По условиям техзадания пользователь не может сохранить изменения, если он указал, что дата у задачи есть, но не выбрал её. Аналогично с днями повторения. Поэтому нам нужно блокировать кнопку в таких случаях.
   const isBlockSaveButton = (isDateShowing && isRepeatingTask) ||
     (isRepeatingTask && !isRepeating(activeRepeatingDays));
 
