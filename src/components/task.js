@@ -89,6 +89,7 @@ export default class Task extends AbstractComponent {
       .addEventListener(`click`, handler);
   }
 
+  // методы для установки обработчиков клика для каждой кнопки.
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.card__btn--favorites`)
       .addEventListener(`click`, handler);

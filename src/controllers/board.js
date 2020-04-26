@@ -111,6 +111,8 @@ export default class BoardController {
     });
   }
 
+  // Эта функция должна вызываться в обработчике клика и получать на вход старые и новые данные (задачу и измененную задачу).
+  // Задача метода — обновить моки и вызывать метод render у конкретного экземпляра TaskController с обновлёнными данными
   _onDataChange(taskController, oldData, newData) {
     const index = this._tasks.findIndex((it) => it === oldData);
 
