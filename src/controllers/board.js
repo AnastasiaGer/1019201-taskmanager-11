@@ -12,15 +12,15 @@ const SHOWING_TASKS_COUNT_ON_START = 8;
 const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 
-const renderTasks = (taskListElement, tasks) => {
+const renderTasks = (taskListElement, tasks, onDataChange) => {
   return tasks.map((task) => {
-    const taskController = new TaskController(taskListElement);
-
+    const taskController = new TaskController(taskListElement, onDataChange);
     taskController.render(task);
 
     return taskController;
   });
 };
+
 
 // Встраиваем сортировку карточек в рендеринг при изменении типа сортировки. const showingTasks = tasks.slice(); имеет важную роль. Метод массива `sort` меняет массив, но изменять входные данные плохая практика. Поэтому на строке 50 мы создаем копию входного массива и затем работаем именно с ним.
 const getSortedTasks = (tasks, sortType, from, to) => {
@@ -56,6 +56,8 @@ export default class BoardController {
     this._showedTaskControllers = [];
     this._showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
 
+    this._onDataChange = this._onDataChange.bind(this);
+
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
@@ -78,7 +80,8 @@ export default class BoardController {
 
     const taskListElement = this._tasksComponent.getElement();
 
-    const newTasks = renderTasks(taskListElement, this._tasks.slice(0, this._showingTasksCount));
+    const newTasks = renderTasks(taskListElement, this._tasks.slice(0, this._showingTasksCount), this._onDataChange);
+
     this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
 
     this._renderLoadMoreButton();
@@ -98,7 +101,7 @@ export default class BoardController {
       this._showingTasksCount = this._showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
 
       const sortedTasks = getSortedTasks(this._tasks, this._sortComponent.getSortType(), prevTasksCount, this._showingTasksCount);
-      const newTasks = renderTasks(taskListElement, sortedTasks);
+      const newTasks = renderTasks(taskListElement, sortedTasks, this._onDataChange);
 
       this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
 
@@ -106,6 +109,18 @@ export default class BoardController {
         remove(this._loadMoreButtonComponent);
       }
     });
+  }
+
+  _onDataChange(taskController, oldData, newData) {
+    const index = this._tasks.findIndex((it) => it === oldData);
+
+    if (index === -1) {
+      return;
+    }
+
+    this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
+
+    taskController.render(this._tasks[index]);
   }
 
   _onSortTypeChange(sortType) {
@@ -116,7 +131,7 @@ export default class BoardController {
 
     taskListElement.innerHTML = ``;
 
-    const newTasks = renderTasks(taskListElement, sortedTasks);
+    const newTasks = renderTasks(taskListElement, sortedTasks, this._onDataChange);
     this._showedTaskControllers = newTasks;
 
     this._renderLoadMoreButton();
