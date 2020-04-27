@@ -16,6 +16,8 @@ export default class AbstractSmartComponent extends AbstractComponent {
 
     parent.replaceChild(newElement, oldElement);
 
+    // При перерисовке компонента все обработчики событий будут утеряны, поэтому их нужно навесить заново в методе recoveryListeners
+
     this.recoveryListeners();
   }
 }
