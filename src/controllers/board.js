@@ -1,5 +1,3 @@
-// Контроллер нужен нам чтобы взять на себя задачу рендеринга доски с задачами. Чтобы рендерить нужен контейнер - его передадим в конструктор. Задачи могли бы тоже передать в конструктор, но тогда мы жестко привязаны к изночальному массиву. А так у пользователя класса появится возможность обновлять задачи.
-
 import LoadMoreButtonComponent from "../components/load-more-button.js";
 import NoTasksComponent from "../components/no-tasks.js";
 import SortComponent, {SortType} from "../components/sort.js";
@@ -11,7 +9,6 @@ import {render, remove, RenderPosition} from "../utils/render.js";
 const SHOWING_TASKS_COUNT_ON_START = 8;
 const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
-
 const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {
   return tasks.map((task) => {
     const taskController = new TaskController(taskListElement, onDataChange, onViewChange);
@@ -21,8 +18,6 @@ const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {
   });
 };
 
-
-// Встраиваем сортировку карточек в рендеринг при изменении типа сортировки. const showingTasks = tasks.slice(); имеет важную роль. Метод массива `sort` меняет массив, но изменять входные данные плохая практика. Поэтому на строке 50 мы создаем копию входного массива и затем работаем именно с ним.
 const getSortedTasks = (tasks, sortType, from, to) => {
   let sortedTasks = [];
   const showingTasks = tasks.slice();
@@ -44,11 +39,10 @@ const getSortedTasks = (tasks, sortType, from, to) => {
 
 
 export default class BoardController {
-  constructor(container) {
-    // проинициализируем статичные компоненты в конструкторе
+  constructor(container, tasksModel) {
     this._container = container;
+    this._tasksModel = tasksModel;
 
-    this._tasks = [];
     this._showedTaskControllers = [];
     this._showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
     this._noTasksComponent = new NoTasksComponent();
@@ -63,12 +57,10 @@ export default class BoardController {
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  render(tasks) {
-    // Перенесет рендеринг `load-more` в функцию. В обработчике изменения типа сортировки отрендерим задачи не сортируя их. Подготовили хорошую почву. Готов перерендеринг карточек при клике по кропке сортировки.
-    this._tasks = tasks;
-
+  render() {
     const container = this._container.getElement();
-    const isAllTasksArchived = this._tasks.every((task) => task.isArchive);
+    const tasks = this._tasksModel.getTasks();
+    const isAllTasksArchived = tasks.every((task) => task.isArchive);
 
     if (isAllTasksArchived) {
       render(container, this._noTasksComponent, RenderPosition.BEFOREEND);
@@ -78,16 +70,24 @@ export default class BoardController {
     render(container, this._sortComponent, RenderPosition.BEFOREEND);
     render(container, this._tasksComponent, RenderPosition.BEFOREEND);
 
-    const taskListElement = this._tasksComponent.getElement();
-
-    const newTasks = renderTasks(taskListElement, this._tasks.slice(0, this._showingTasksCount), this._onDataChange, this._onViewChange);
-    this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
+    this._renderTasks(tasks.slice(0, this._showingTasksCount));
 
     this._renderLoadMoreButton();
   }
 
+  _renderTasks(tasks) {
+    const taskListElement = this._tasksComponent.getElement();
+
+    const newTasks = renderTasks(taskListElement, tasks, this._onDataChange, this._onViewChange);
+    this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
+    this._showingTasksCount = this._showedTaskControllers.length;
+  }
+
+
   _renderLoadMoreButton() {
-    if (this._showingTasksCount >= this._tasks.length) {
+    remove(this._loadMoreButtonComponent);
+
+    if (this._showingTasksCount >= this._tasksModel.getTasks().length) {
       return;
     }
 
@@ -96,32 +96,23 @@ export default class BoardController {
 
     this._loadMoreButtonComponent.setClickHandler(() => {
       const prevTasksCount = this._showingTasksCount;
+      const tasks = this._tasksModel.getTasks();
       const taskListElement = this._tasksComponent.getElement();
       this._showingTasksCount = this._showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
 
-      const sortedTasks = getSortedTasks(this._tasks, this._sortComponent.getSortType(), prevTasksCount, this._showingTasksCount);
+      const sortedTasks = getSortedTasks(tasks, this._sortComponent.getSortType(), prevTasksCount, this._showingTasksCount);
       const newTasks = renderTasks(taskListElement, sortedTasks, this._onDataChange, this._onViewChange);
 
       this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
-
-      if (this._showingTasksCount >= this._tasks.length) {
-        remove(this._loadMoreButtonComponent);
-      }
     });
   }
 
-  // Эта функция должна вызываться в обработчике клика и получать на вход старые и новые данные (задачу и измененную задачу).
-  // Задача метода — обновить моки и вызывать метод render у конкретного экземпляра TaskController с обновлёнными данными
   _onDataChange(taskController, oldData, newData) {
-    const index = this._tasks.findIndex((it) => it === oldData);
+    const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
 
-    if (index === -1) {
-      return;
+    if (isSuccess) {
+      taskController.render(newData);
     }
-
-    this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
-
-    taskController.render(this._tasks[index]);
   }
 
   _onViewChange() {
@@ -131,7 +122,7 @@ export default class BoardController {
   _onSortTypeChange(sortType) {
     this._showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
 
-    const sortedTasks = getSortedTasks(this._tasks, sortType, 0, this._showingTasksCount);
+    const sortedTasks = getSortedTasks(this._tasksModel.getTasks(), sortType, 0, this._showingTasksCount);
     const taskListElement = this._tasksComponent.getElement();
 
     taskListElement.innerHTML = ``;
