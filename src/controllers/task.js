@@ -1,6 +1,6 @@
 import TaskComponent from "../components/task.js";
 import TaskEditComponent from "../components/task-edit.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
+import {render, replace, remove, RenderPosition} from "../utils/render.js";
 
 const Mode = {
   DEFAULT: `default`,
@@ -8,21 +8,17 @@ const Mode = {
 };
 
 export default class TaskController {
-  // Конструктор должен принимать container — элемент, в который контроллер будет всё отрисовывать.
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
-
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
-
     this._taskComponent = null;
     this._taskEditComponent = null;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  // Метод render должен принимать данные одной задачи. Также в него должен переехать код, который отвечает за отрисовку задачи, ее замену на форму редактирования и наоборот, а также установка связанных с этим обработчиков событий.
   render(task) {
     const oldTaskComponent = this._taskComponent;
     const oldTaskEditComponent = this._taskEditComponent;
@@ -64,6 +60,12 @@ export default class TaskController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToTask();
     }
+  }
+
+  destroy() {
+    remove(this._taskEditComponent);
+    remove(this._taskComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replaceEditToTask() {
