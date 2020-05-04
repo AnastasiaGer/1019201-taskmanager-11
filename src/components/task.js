@@ -1,5 +1,8 @@
 import AbstractComponent from "./abstract-component.js";
 import {formatTime, formatDate} from "../utils/common.js";
+import {isOverdueDate} from "../utils/common.js";
+import {encode} from "he";
+
 
 const createButtonMarkup = (name, isActive = true) => {
   return (
@@ -12,32 +15,38 @@ const createButtonMarkup = (name, isActive = true) => {
   );
 };
 
+// Функцию для генерации HTML-разметки можно превратить в метод класса,
+// однако делать мы этого не будем, потому что это не критично,
+// а функция у нас уже была описана
 const createTaskTemplate = (task) => {
-  const {description, dueDate, color, repeatingDays} = task;
-  // Проверка на просрочку
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  // Интерпретация в булевое значение
+  // Обратите внимание, что всю работу мы производим заранее.
+  // Внутри шаблонной строки мы не производим никаких вычислений,
+  // потому что внутри большой разметки сложно искать какой-либо код
+  const {description: notSanitizedDescription, dueDate, color, repeatingDays} = task;
+
+  const isExpired = dueDate instanceof Date && isOverdueDate(dueDate, new Date());
   const isDateShowing = !!dueDate;
-  // Форматирование даты
+
   const date = isDateShowing ? formatDate(dueDate) : ``;
   const time = isDateShowing ? formatTime(dueDate) : ``;
-  // Опредление повторямости
-  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
-  // Проверка просрочки
-  const deadlineClass = isExpired ? `card--deadline` : ``;
-  // Добавлен ли в Favorite или Archive
+  const description = encode(notSanitizedDescription);
+
   const editButton = createButtonMarkup(`edit`);
   const archiveButton = createButtonMarkup(`archive`, !task.isArchive);
   const favoritesButton = createButtonMarkup(`favorites`, !task.isFavorite);
 
-  return `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
-    <div class="card__form">
-      <div class="card__inner">
-        <div class="card__control">
-          ${editButton}
-          ${archiveButton}
-          ${favoritesButton}
-        </div>
+  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
+  const deadlineClass = isExpired ? `card--deadline` : ``;
+
+  return (
+    `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
+      <div class="card__form">
+        <div class="card__inner">
+          <div class="card__control">
+            ${editButton}
+            ${archiveButton}
+            ${favoritesButton}
+          </div>
         <div class="card__color-bar">
           <svg class="card__color-bar-wave" width="100%" height="10">
             <use xlink:href="#wave"></use>
@@ -60,7 +69,7 @@ const createTaskTemplate = (task) => {
         </div>
       </div>
     </div>
-  </article>`;
+  </article>`);
 };
 
 export default class Task extends AbstractComponent {
@@ -78,6 +87,7 @@ export default class Task extends AbstractComponent {
     this.getElement().querySelector(`.card__btn--edit`)
       .addEventListener(`click`, handler);
   }
+
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.card__btn--favorites`)
       .addEventListener(`click`, handler);
