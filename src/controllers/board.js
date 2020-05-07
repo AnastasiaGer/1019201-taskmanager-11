@@ -66,29 +66,11 @@ export default class BoardController {
 
   show() {
     this._container.show();
-    this.rerender();
+    this._removeTasks();
+    this.render();
   }
 
   render() {
-    const container = this._container.getElement();
-    const tasks = this._tasksModel.getTasks();
-    const isAllTasksArchived = tasks.every((task) => task.isArchive);
-
-    if (isAllTasksArchived) {
-      render(container, this._noTasksComponent, RenderPosition.BEFOREEND);
-      return;
-    }
-
-    render(container, this._sortComponent, RenderPosition.BEFOREEND);
-    render(container, this._tasksComponent, RenderPosition.BEFOREEND);
-
-    this._renderTasks(tasks.slice(0, this._showingTasksCount));
-
-    this._renderLoadMoreButton();
-  }
-
-  rerender() {
-    this._removeTasks();
     const container = this._container.getElement();
     const tasks = this._tasksModel.getTasks();
     const isAllTasksArchived = tasks.every((task) => task.isArchive);
