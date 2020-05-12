@@ -1,5 +1,5 @@
 
-export const Color = {
+export const COLOR = {
   BLACK: `black`,
   YELLOW: `yellow`,
   BLUE: `blue`,
@@ -7,7 +7,7 @@ export const Color = {
   PINK: `pink`,
 };
 
-export const COLORS = Object.values(Color);
+export const COLORS = Object.values(COLOR);
 
 export const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
 
