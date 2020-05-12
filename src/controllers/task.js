@@ -2,7 +2,7 @@ import TaskComponent from "../components/task.js";
 import TaskEditComponent from "../components/task-edit.js";
 import TaskModel from "../models/task.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
-import {COLOR, DAYS} from "../const.js";
+import {Color, DAYS} from "../const.js";
 
 export const Mode = {
   ADDING: `adding`,
@@ -22,7 +22,7 @@ export const EmptyTask = {
     "sa": false,
     "su": false,
   },
-  color: COLOR.BLACK,
+  color: Color.BLACK,
   isFavorite: false,
   isArchive: false,
 };
