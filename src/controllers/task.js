@@ -3,6 +3,7 @@ import TaskEditComponent from "../components/task-edit.js";
 import TaskModel from "../models/task.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
 import {Color, DAYS} from "../const.js";
+
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const Mode = {
@@ -94,9 +95,19 @@ export default class TaskController {
       const formData = this._taskEditComponent.getData();
       const data = parseFormData(formData);
 
+      this._taskEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, task, data);
     });
-    this._taskEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
+    this._taskEditComponent.setDeleteButtonClickHandler(() => {
+      this._taskEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, task, null);
+    });
 
     switch (mode) {
       case Mode.DEFAULT:
@@ -138,6 +149,11 @@ export default class TaskController {
     setTimeout(() => {
       this._taskEditComponent.getElement().style.animation = ``;
       this._taskComponent.getElement().style.animation = ``;
+
+      this._taskEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
