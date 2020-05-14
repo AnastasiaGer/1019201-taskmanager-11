@@ -1,4 +1,3 @@
-
 export const Color = {
   BLACK: `black`,
   YELLOW: `yellow`,
