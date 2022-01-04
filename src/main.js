@@ -8,7 +8,7 @@ import TasksModel from "./models/tasks.js";
 import {render, RenderPosition} from "./utils/render.js";
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
-const END_POINT = `https://11.ecmascript.pages.academy/task-manager`;
+const END_POINT = `https://16.ecmascript.pages.academy/task-manager`;
 
 const dateTo = new Date();
 const dateFrom = (() => {
